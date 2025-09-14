@@ -1,0 +1,107 @@
+
+<div class="task-container">
+  <div class="header">
+    <div class="header-content">
+      <h1>Gestionnaire de Tâches</h1>
+      @if (!showForm) {
+        <button mat-fab
+                color="primary"
+                (click)="onAddTask()"
+                class="add-button">
+          <mat-icon>add</mat-icon>
+        </button>
+      }
+    </div>
+
+    <mat-button-toggle-group
+      [value]="currentFilter$ | async"
+      (change)="onFilterChange($event.value)"
+      class="filter-group">
+      <mat-button-toggle value="all">
+        <div class="filter-item">
+          <span class="filter-label">Toutes</span>
+          <span class="filter-count">{{ (tasks$ | async)?.length || 0 }}</span>
+        </div>
+      </mat-button-toggle>
+      <mat-button-toggle value="active">
+        <div class="filter-item">
+          <span class="filter-label">À faire</span>
+          <span class="filter-count">{{ getActiveCount() }}</span>
+        </div>
+      </mat-button-toggle>
+      <mat-button-toggle value="completed">
+        <div class="filter-item">
+          <span class="filter-label">Terminées</span>
+          <span class="filter-count">{{ getCompletedCount() }}</span>
+        </div>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  @if (showForm) {
+    <div class="form-container">
+      <app-task-form
+        [task]="editingTask"
+        (submitTask)="onTaskSubmit($event)"
+        (cancelEdit)="onCancelEdit()">
+      </app-task-form>
+    </div>
+  }
+
+  <div class="task-list">
+    @if (loading) {
+      <div class="loader">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    }
+
+    @if (filteredTasks$ | async; as tasks) {
+      @if (tasks.length === 0) {
+        <div class="empty-state">
+          <mat-icon>assignment</mat-icon>
+          <p>Aucune tâche à afficher</p>
+        </div>
+      }
+
+      @for (task of tasks; track task.id) {
+        <div class="task-item" [class.completed]="task.completed">
+          <div class="task-content">
+            <mat-checkbox
+              [checked]="task.completed"
+              (change)="toggleTask(task)"
+              color="primary"
+              class="task-checkbox">
+            </mat-checkbox>
+
+            <div class="task-details">
+              <p class="task-label" [class.completed]="task.completed">
+                {{ task.label }}
+              </p>
+              @if (task.description) {
+                <p class="task-description">
+                  {{ task.description }}
+                </p>
+              }
+            </div>
+
+            <div class="task-actions">
+              <button mat-icon-button
+                      [disabled]="task.completed"
+                      (click)="onEditTask(task)"
+                      class="edit-button"
+                      [matTooltip]="'Modifier'">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button
+                      (click)="deleteTask(task.id)"
+                      class="delete-button"
+                      [matTooltip]="'Supprimer'">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
