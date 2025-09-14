@@ -1,0 +1,45 @@
+
+<form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+  <div class="form-group">
+    <mat-form-field appearance="outline">
+      <mat-label>Titre de la tâche</mat-label>
+      <input matInput
+             formControlName="label"
+             placeholder="Entrez le titre de la tâche"
+             required>
+      @if (taskForm.get('label')?.errors?.['required'] && taskForm.get('label')?.touched) {
+        <mat-error>Le titre est requis</mat-error>
+      }
+      @if (taskForm.get('label')?.errors?.['minlength']) {
+        <mat-error>Le titre doit contenir au moins 3 caractères</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput
+                formControlName="description"
+                placeholder="Entrez une description (optionnel)"
+                rows="3">
+      </textarea>
+    </mat-form-field>
+  </div>
+
+  <div class="actions">
+    <button mat-stroked-button
+            type="button"
+            (click)="onCancel()"
+            class="cancel-button">
+      Annuler
+    </button>
+    <button mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="taskForm.invalid"
+            class="submit-button">
+      {{ taskForm.get('label')?.value ? 'Modifier' : 'Ajouter' }}
+    </button>
+  </div>
+</form>
